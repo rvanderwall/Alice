@@ -1,0 +1,206 @@
+
+
+// Funtion to replaces all occurances of substring substr1 with substr2 within strng
+// if type == 0 straight string replacement
+// if type == 1 assumes padded strings and replaces whole words only
+// if type == 2 non case sensitive assumes padded strings to compare whole word only
+// if type == 3 non case sensitive straight string replacement
+
+	var RPstrg = "";
+
+	function replaceStr( strng, substr1, substr2, type){
+		var pntr = -1; aString = strng;
+		if( type == 0 ){
+			if( strng.indexOf( substr1 ) >= 0 ){ pntr = strng.indexOf( substr1 );	}
+		} else if( type == 1 ){
+			if( strng.indexOf( " "+ substr1 +" " ) >= 0 ){ pntr = strng.indexOf( " " + substr1 + " " ) + 1; }
+		} else if( type == 2 ){
+			bstrng = strng.toUpperCase();
+			bsubstr1 = substr1.toUpperCase();
+			if( bstrng.indexOf( " "+ bsubstr1 +" " )>= 0 ){ pntr = bstrng.indexOf( " " + bsubstr1 + " " ) + 1; }
+		} else {
+			bstrng = strng.toUpperCase();
+			bsubstr1 = substr1.toUpperCase();
+			if( bstrng.indexOf( bsubstr1 ) >= 0 ){ pntr = bstrng.indexOf( bsubstr1 ); }
+		}
+		if( pntr >= 0 ){
+			RPstrg += strng.substring( 0, pntr ) + substr2;
+			aString = strng.substring(pntr + substr1.length, strng.length );
+			if( aString.length > 0 ){ replaceStr( aString, substr1, substr2, type ); }
+		}
+		aString =  RPstrg + aString;
+		RPstrg = "";
+		return aString;
+	}
+
+
+// This is the entry point and the I/O of this code
+
+	var wTopic = "";											// Last worthy responce
+	var sTopic = "";											// Last worthy responce
+	var greet = false;
+	var wPrevious = "";        		    				// so we can check for repeats
+
+	function listen(User){
+  		sInput = User;
+		if( sInput != "" ){
+			wInput = padString(sInput.toUpperCase());	// Work copy
+			var foundkey = maxKey;         		  		// assume it's a repeat input
+			if (wInput != wPrevious){   					// check if user repeats himself
+				foundkey = findkey(wInput);   			// look for a keyword.
+			}
+			if( foundkey == keyNotFound ){
+				if( !greet ){ greet = true; return "Don't you ever say Hello?" }
+				else {
+					wPrevious = wInput;          			// save input to check repeats
+					if(( sInput.length < 10 ) && ( wTopic != "" ) && ( wTopic != wPrevious )){
+						lTopic = conjugate( sTopic ); sTopic = ""; wTopic = "";
+						return 'OK... "' + lTopic + '". Tell me more.';
+					} else {
+						if( sInput.length < 15 ){
+							return "Tell me more...";
+						} else { return phrase( sInput, foundkey ); }
+					}
+				}
+			} else {
+				if( sInput.length > 12 ){ sTopic = sInput; wTopic = wInput; }
+				greet = true; wPrevious = wInput;  			// save input to check repeats
+				return phrase( sInput, foundkey );			// Get our response
+			}
+
+
+    response[116]="Please don't repeat yourself!";
+
+    loaded = true;			// set the flag as load done
+
+///////////////////////////////////////////////////////////////
+//***********************************************************//
+//* everything below here was originally in dia_1.html      *//
+//***********************************************************//
+///////////////////////////////////////////////////////////////
+
+// Chat Bot by George Dunlop, www.peccavi.com
+// May be used/modified if credit line is retained (c) 1997 All rights reserved
+
+// Put together an array for the dialog
+
+	chatmax = 5;						// number of lines / 2
+	chatpoint = 0;
+	chatter = new Array(chatmax);
+
+// Wait function to allow our pieces to get here prior to starting
+
+	function hello(){
+		chatter[chatpoint] = "> Hello, I am Eliza.";
+		chatpoint = 1;
+		return write();
+	}
+	function start(){
+		for( i = 0; i < chatmax; i++){ chatter[i] = ""; }
+		chatter[chatpoint] = "  Loading...";
+		document.Eliza.input.focus();
+		write();
+		if( loaded ){ hello() }
+		else { setTimeout("start()", 1000); }
+	}
+
+// Fake time thinking to allow for user self reflection
+// And to give the illusion that some thinking is going on
+
+	var elizaresponse = "";
+
+	function think(){
+		document.Eliza.input.value = "";
+		if( elizaresponse != "" ){ respond(); }
+		else { setTimeout("think()", 250); }
+	}
+	function dialog(){
+		var Input = document.Eliza.input.value;	  // capture input and copy to log
+		document.Eliza.input.value = "";
+		chatter[chatpoint] = " \n* " + Input;
+		elizaresponse = listen(Input);
+		setTimeout("think()", 1000 + Math.random()*3000);
+		chatpoint ++ ;
+		if( chatpoint >= chatmax ){ chatpoint = 0; }
+		return write();
+	}
+	function respond(){
+		chatpoint -- ;
+		if( chatpoint < 0 ){ chatpoint = chatmax-1; }
+		chatter[chatpoint] += "\n> " + elizaresponse;
+		chatpoint ++ ;
+		if( chatpoint >= chatmax ){ chatpoint = 0; }
+		return write();
+	}
+// Allow for unprompted response from the engine
+
+	function update(str1,str2){
+		chatter[chatpoint] = " \n> " + str1;
+		chatter[chatpoint] += "\n> " + str2;
+		chatpoint ++ ;
+		if( chatpoint >= chatmax ){ chatpoint = 0; }
+		return write();
+	}
+
+	function write(){
+		document.Eliza.log.value = "";
+		for(i = 0; i < chatmax; i++){
+			n = chatpoint + i;
+			if( n < chatmax ){ document.Eliza.log.value += chatter[ n ]; }
+			else { document.Eliza.log.value += chatter[ n - chatmax ]; }
+		}
+		refresh();
+		return false;                              // don't redraw the ELIZA's form!
+	}
+	function refresh(){ setTimeout("write()", 10000); }  // Correct user overwrites
+
+
+// --></SCRIPT>
+
+</HEAD>
+<body onload = "start();" bgcolor=#FFFFFF>
+
+
+<h1>Eliza, the Rogerian Therapist</h1>
+
+<!-- contents -->
+
+<p>ELIZA is a computer program that emulates a Rogerian psychotherapist.
+   Just type your questions and concerns and hit return.  Eliza will answer
+   you. </p>
+
+
+<table cellspacing="0" cellpadding="2" border="0" align="center" class="neurotoy">
+	<tr><th bgcolor=#000000 align="left">
+		<font color="#FFFFFF">Talk to Eliza</Font>
+	</td></tr>
+  	<tr><td bgcolor=#0097FF>
+    	<form name="Eliza" onSubmit="return dialog();">
+      	<textarea rows=14 cols=55 name="log"></textarea>
+      	<center><font color=#000000><br>Input:</font>
+			<INPUT TYPE="text" size = 50 NAME="input" VALUE=""></center>
+    	</form>
+  	</td></tr>
+</table>
+
+
+<p>When the original ELIZA first
+   appeared in the 60's, some people actually mistook her for
+   human. The illusion of intelligence works best, however,
+   if you limit your conversation to talking about yourself
+   and your life.</p>
+
+<p>This javascript version of ELIZA was originally written by
+   <a href="http://www.sabren.net/">Michal Wallace</a> and
+   significantly enhanced by
+   <a href="http://www.peccavi.com/">George Dunlop</a>.
+</p>
+<div align="center">
+<br><small>
+&copy; 1999 manifestation.com
+[&nbsp;PMB&nbsp;417&nbsp;..&nbsp;10800&nbsp;Alpharetta&nbsp;Hwy,&nbsp;Suite&nbsp;208&nbsp;..&nbsp;Roswell,&nbsp;GA&nbsp;30076&nbsp;]
+<br>webmaster:&nbsp;<a href="mailto:sabren@manifestation.com">sabren@manifestation.com</a>
+&nbsp;&nbsp;
+</small></div>
+
+</BODY></HTML>
