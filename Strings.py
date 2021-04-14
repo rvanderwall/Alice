@@ -19,6 +19,7 @@ def unpad_string(str):
 
 
 def remove_end_punctuation(str):
+    str = str.strip()
     if str[len(str)-1] in punctuation:
         return str[:-1]
     return str

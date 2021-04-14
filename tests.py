@@ -1,12 +1,12 @@
 import unittest
 
-from keywords import find_response_for_keyword, KwResponse
+from keywords import find_response_for_keyword, KwResponse, _no_keyword_found_resp
 from conjegations import conjugate
 from Strings import pad_string, unpad_string, remove_end_punctuation, get_text_after_keyword
-from eliza import Eliza
+from alice import Alice
 
 
-class ElizaTests(unittest.TestCase):
+class AliceTests(unittest.TestCase):
     def test_keyword_lookup_from_word(self):
         # Arrange
 
@@ -62,7 +62,7 @@ class ElizaTests(unittest.TestCase):
 
     def test_remove_punctuation(self):
         # Arrange
-        punctuated_str = "hello, isn't this nice?"
+        punctuated_str = "hello, isn't this nice? "
 
         # Act
         clear_str = remove_end_punctuation(punctuated_str)
@@ -92,12 +92,38 @@ class ElizaTests(unittest.TestCase):
 
     def test_phrase(self):
         # Arrange
-        e = Eliza()
-        orig = "I think this works Eliza."
+        e = Alice()
+        orig = "I think this works Alice."
         resp = KwResponse("THINK", ["Do you doubt that<*"])
 
         # Act
         ph = e.form_response_text(orig, "THINK", resp)
 
         # Assert
-        self.assertEqual("Do you doubt that this works Eliza?", ph)
+        self.assertEqual("Do you doubt that this works Alice?", ph)
+
+    def test_no_keyword_response(self):
+        # Arrange
+        a = Alice()
+        orig = "my dog is misbehaving"
+        resp = _no_keyword_found_resp
+        resp.next = 0
+
+        # Act
+        ph = a.form_response_text(orig, "DOG", resp)
+
+        # Assert
+        self.assertEqual("Say, do you have any psychological problems?", ph)
+
+    def test_duplicate_input(self):
+        # Arrange
+        a = Alice()
+        input = "i need a coffee with no keywords"
+
+        # Act
+        _ = a.listen(input)         # Get past the greeting
+        _ = a.listen(input)         # First input
+        resp = a.listen(input)      # Duplicate input
+
+        # Assert
+        self.assertEqual("Why did you repeat yourself?", resp)

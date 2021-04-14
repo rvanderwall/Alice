@@ -1,4 +1,4 @@
-from eliza import Eliza
+from alice import Alice
 from UserInput import get_user_input
 import subprocess
 #import speech_recognition as sr
@@ -19,10 +19,13 @@ Robert Vanderwall
 2020
 """
 
-
+def clear_speech():
+    subprocess.call(["kill", "`pgrep speechsynthesisd`"])
 def show_response(resp):
     print(f"* {resp}")
-    subprocess.call(['say', resp])
+    voice = "Karen"
+    voice = "Alex"
+    subprocess.call(['say', "-v", voice, resp])
 
 
 def get_response(context, e, in_text):
@@ -34,7 +37,7 @@ def get_response(context, e, in_text):
 
 
 def loop():
-    e = Eliza()
+    e = Alice()
     done = False
     context = None
     show_response("Welcome, what is on your mind?")
